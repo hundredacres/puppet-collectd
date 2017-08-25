@@ -22,7 +22,7 @@ class collectd::repo::debian {
         repos    => 'main',
         key      => {
           'id'     => '7543C08D555DC473B9270ACDAF7ECBB3476ACEB3',
-          'server' => 'keyserver.ubuntu.com',
+          'server' => 'hkp://keyserver.ubuntu.com:80',
         },
       }
     }
