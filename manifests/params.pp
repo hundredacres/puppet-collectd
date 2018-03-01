@@ -26,12 +26,12 @@ class collectd::params {
   $plugin_conf_dir_mode      = '0750'
   $ci_package_repo           = undef
 
-  case getvar('::kernel') {
-    'OpenBSD': { $has_wordexp   = false }
-    default: { $has_wordexp   = true }
+  case $facts['kernel'] {
+    'OpenBSD': { $has_wordexp = false }
+    default:   { $has_wordexp = true }
   }
 
-  case $::osfamily {
+  case $facts['os']['family'] {
     'Debian': {
       $package_name       = [ 'collectd', 'collectd-core' ]
       $package_provider   = 'apt'
@@ -130,10 +130,10 @@ class collectd::params {
     }
 
     default: {
-      fail("${::osfamily} is not supported.")
+      fail("${facts['os']['family']} is not supported.")
     }
   }
 
   # Override with custom fact value (present only if python is installed)
-  $python_dir            = pick($::python_dir, $default_python_dir)
+  $python_dir = pick($facts['python_dir'], $default_python_dir)
 }

@@ -36,22 +36,22 @@
 #    'Password' => 'guest_pass',
 #    'Scheme'   => 'http',
 #    'Port'     => '15672',
-#    'Host'     => $::fqdn,
+#    'Host'     => $facts['fqdn'],
 #    'Realm'    => '"RabbitMQ Management"',
 #   }
 #
 class collectd::plugin::rabbitmq (
   # lint:ignore:parameter_order
-  $config           = {
+  Hash $config      = {
     'Username' => 'guest',
     'Password' => 'guest',
     'Scheme'   => 'http',
     'Port'     => '15672',
-    'Host'     => $::fqdn,
+    'Host'     => $facts['fqdn'],
     'Realm'    => '"RabbitMQ Management"',
   },
   # lint:endignore
-  $ensure           = 'present',
+  String $ensure    = 'present',
   $interval         = undef,
   $manage_package   = undef,
   $package_name     = 'collectd-rabbitmq',
@@ -61,10 +61,7 @@ class collectd::plugin::rabbitmq (
 ) {
   include ::collectd
 
-  validate_string($ensure)
-  validate_hash($config)
-
-  case $::osfamily {
+  case $facts['os']['family'] {
     'RedHat': {
       $_custom_types_db = '/usr/share/collectd-rabbitmq/types.db.custom'
     }
@@ -84,7 +81,7 @@ class collectd::plugin::rabbitmq (
         require => Package['python-pip'],
       }
 
-      if $::osfamily == 'RedHat' {
+      if $facts['os']['family'] == 'RedHat' {
         # Epel is installed in install.pp if manage_repo is true
         # python-pip doesn't exist in base for RedHat. Need epel installed first
         if (defined(Class['::epel'])) {

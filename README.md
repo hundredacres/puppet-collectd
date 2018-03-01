@@ -197,15 +197,16 @@ documentation for each plugin for configurable attributes.
 * `write_tsdb` (see [collectd::plugin::write_tsdb](#class-collectdpluginwrite_tsdb)
   below)
 * `zfs_arc` (see [collectd::plugin::zfs_arc](#class-collectdpluginzfs_arc) below)
+* `zookeeper` (see
+  [collectd::plugin::zookeeper](#class-collectdzookeeper) below)
 
 ### Class: `collectd::plugin::aggregation`
 
 ```puppet
-collectd::plugin::aggregation::aggregator {
-  cpu':
+collectd::plugin::aggregation::aggregator { 'cpu':
     plugin           => 'cpu',
     agg_type         => 'cpu',
-    groupby          => ["Host", "TypeInstance",],
+    groupby          => ['Host', 'TypeInstance',],
     calculateaverage => true,
 }
 ```
@@ -215,7 +216,7 @@ You can as well configure this plugin with a parameterized class :
 ```puppet
 class { 'collectd::plugin::aggregation':
   aggregators => {
-    cpu' => {
+    'cpu' => {
       plugin           => 'cpu',
       agg_type         => 'cpu',
       groupby          => ["Host", "TypeInstance",],
@@ -815,7 +816,7 @@ collectd::plugin::genericjmx::mbean {
   'garbage_collector':
     object_name     => 'java.lang:type=GarbageCollector,*',
     instance_prefix => 'gc-',
-    instance_from   => 'name',
+    instance_from   => ['name'],
     values          => [
       {
         mbean_type => 'invocations',
@@ -986,6 +987,7 @@ collectd::plugin::mysql::database { 'betadase':
   password    => 'secret',
   port        => '3306',
   masterstats => true,
+  wsrepstats  => true,
 }
 ```
 
@@ -1457,7 +1459,7 @@ class { '::collectd::plugin::rabbitmq':
     'Password' => $admin_pass,
     'Scheme'   => 'https',
     'Port'     => '15671',
-    'Host'     => $::fqdn,
+    'Host'     => $facts['fqdn'],
     'Realm'    => '"RabbitMQ Management"',
   },
 }
@@ -1629,7 +1631,7 @@ collectd::plugin::tail::file { 'exim-log':
 }
 ```
 
-####Class: `collectd::plugin::thermal`
+#### Class: `collectd::plugin::thermal`
 
 ```puppet
 class { '::collectd::plugin::thermal':
@@ -1645,7 +1647,7 @@ class { 'collectd::plugin::threshold':
 }
 ```
 
-####Class: `collectd::plugin::unixsock`
+#### Class: `collectd::plugin::unixsock`
 
 ```puppet
 class {'collectd::plugin::unixsock':
@@ -1830,6 +1832,15 @@ class { 'collectd::plugin::write_tsdb':
 
 ```puppet
 class { 'collectd::plugin::zfs_arc':
+}
+```
+
+#### Class: `collectd::plugin::zookeeper`
+
+```puppet
+class { 'collectd::plugin::zookeeper':
+  zookeeper_host  => 'localhost',
+  zookeeper_port  => '2181',
 }
 ```
 
