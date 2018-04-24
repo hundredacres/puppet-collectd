@@ -108,11 +108,11 @@ class collectd::plugin::rabbitmq (
   file { 'rabbitmq.load':
     ensure  => $ensure,
     path    => "${::collectd::plugin_conf_dir}/10-rabbitmq.conf",
-    owner   => root,
-    group   => $::collectd::root_group,
-    mode    => '0640',
+    owner   => $collectd::config_owner,
+    group   => $collectd::config_group,
+    mode    => $collectd::config_mode,
     content => template('collectd/plugin/rabbitmq.conf.erb'),
-    notify  => Service['collectd'],
+    notify  => Service[$collectd::service_name],
   }
 
   collectd::plugin::python::module { 'collectd_rabbitmq.collectd_plugin':

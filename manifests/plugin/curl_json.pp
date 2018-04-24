@@ -49,10 +49,10 @@ define collectd::plugin::curl_json (
   file {
     "${name}.load":
       path    => "${conf_dir}/${order}-${name}.conf",
-      owner   => 'root',
-      group   => $collectd::root_group,
-      mode    => '0640',
+      owner   => $collectd::config_owner,
+      group   => $collectd::config_group,
+      mode    => $collectd::config_mode,
       content => template('collectd/curl_json.conf.erb'),
-      notify  => Service['collectd'],
+      notify  => Service[$collectd::service_name],
   }
 }

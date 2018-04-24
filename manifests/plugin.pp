@@ -11,16 +11,16 @@ define collectd::plugin (
   include ::collectd
 
   $conf_dir = $::collectd::plugin_conf_dir
-  $root_group = $::collectd::root_group
+  $config_group = $::collectd::config_group
 
   file { "${plugin}.load":
     ensure  => $ensure,
     path    => "${conf_dir}/${order}-${plugin}.conf",
-    owner   => root,
-    group   => $root_group,
-    mode    => '0640',
+    owner   => $collectd::config_owner,
+    group   => $collectd::config_group,
+    mode    => $collectd::config_mode,
     content => template('collectd/loadplugin.conf.erb'),
-    notify  => Service['collectd'],
+    notify  => Service[$collectd::service_name],
   }
 
   # Older versions of this module didn't use the "00-" prefix.
@@ -28,7 +28,7 @@ define collectd::plugin (
   file { "older_${plugin}.load":
     ensure => absent,
     path   => "${conf_dir}/${plugin}.conf",
-    notify => Service['collectd'],
+    notify => Service[$collectd::service_name],
   }
 
   # Older versions of this module use the "00-" prefix by default.
@@ -37,7 +37,7 @@ define collectd::plugin (
     file { "old_${plugin}.load":
       ensure => absent,
       path   => "${conf_dir}/00-${plugin}.conf",
-      notify => Service['collectd'],
+      notify => Service[$collectd::service_name],
     }
   }
 }

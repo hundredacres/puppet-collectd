@@ -12,11 +12,11 @@ class collectd::plugin::filter (
 
   file { $conf_file:
     ensure  => $ensure,
-    owner   => 'root',
-    group   => $collectd::root_group,
-    mode    => '0644',
+    owner   => $collectd::config_owner,
+    group   => $collectd::config_group,
+    mode    => $collectd::config_mode,
     content => "PreCacheChain \"${precachechain}\"\nPostCacheChain \"${postcachechain}\"\n\n",
-    notify  => Service['collectd'],
+    notify  => Service[$collectd::service_name],
   }
 
   unless $ensure == 'present' {

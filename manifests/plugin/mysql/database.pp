@@ -20,10 +20,10 @@ define collectd::plugin::mysql::database (
   file { "${name}.conf":
     ensure  => $ensure,
     path    => "${collectd::plugin_conf_dir}/mysql-${name}.conf",
-    mode    => '0640',
-    owner   => 'root',
-    group   => $collectd::root_group,
+    mode    => $collectd::config_mode,
+    owner   => $collectd::config_owner,
+    group   => $collectd::config_group,
     content => template('collectd/mysql-database.conf.erb'),
-    notify  => Service['collectd'],
+    notify  => Service[$collectd::service_name],
   }
 }
