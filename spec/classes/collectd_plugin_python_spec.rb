@@ -57,7 +57,9 @@ describe 'collectd::plugin::python', type: :class do
           end
 
           it 'will ensure the two directories are here' do
-            is_expected.to contain_file('/tmp/')
+            is_expected.to contain_file('/tmp/').with(
+              require: 'Package[collectd]'
+            )
             is_expected.to contain_file('/data/')
           end
           it 'will set two modulepath in the module conf' do
@@ -82,6 +84,9 @@ describe 'collectd::plugin::python', type: :class do
                 },
                 'foo' => {
                   'config' => [{ 'Verbose' => true, 'Bar' => '"bar"' }]
+                },
+                'alpha' => {
+                  'config' => [{ 'Beta' => 4.2, 'Gamma' => 'b', 'Delta' => ['a', 4, 5] }]
                 }
               }
             }
@@ -137,6 +142,18 @@ describe 'collectd::plugin::python', type: :class do
             )
             is_expected.to contain_concat__fragment('collectd_plugin_python_conf_foo').with(content: %r{Verbose true})
             is_expected.to contain_concat__fragment('collectd_plugin_python_conf_foo').with(content: %r{Bar "bar"})
+          end
+
+          it 'includes alpha module configuration' do
+            is_expected.to contain_concat__fragment('collectd_plugin_python_conf_alpha').with(
+              content: %r{<Module "alpha">},
+              target: "#{options[:plugin_conf_dir]}/python-config.conf"
+            )
+            is_expected.to contain_concat__fragment('collectd_plugin_python_conf_alpha').with(content: %r{Beta 4.2})
+            is_expected.to contain_concat__fragment('collectd_plugin_python_conf_alpha').with(content: %r{Delta "a"})
+            is_expected.to contain_concat__fragment('collectd_plugin_python_conf_alpha').with(content: %r{Delta 4})
+            is_expected.to contain_concat__fragment('collectd_plugin_python_conf_alpha').with(content: %r{Delta 5})
+            is_expected.to contain_concat__fragment('collectd_plugin_python_conf_alpha').with(content: %r{Gamma "b"})
           end
         end
 

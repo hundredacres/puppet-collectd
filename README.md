@@ -103,6 +103,7 @@ documentation for each plugin for configurable attributes.
   below)
 * `amqp`  (see [collectd::plugin::amqp](#class-collectdpluginamqp) below)
 * `apache`  (see [collectd::plugin::apache](#class-collectdpluginapache) below)
+* `battery`  (see [collectd::plugin::battery](#class-collectdpluginbattery) below)
 * `bind`  (see [collectd::plugin::bind](#class-collectdpluginbind) below)
 * `ceph`  (see [collectd::plugin::ceph](#class-ceph) below)
 * `cgroups` (see [collectd::plugin::cgroups](#class-collectdplugincgroups) below)
@@ -129,7 +130,9 @@ documentation for each plugin for configurable attributes.
 * `genericjmx` (see [collectd::plugin::genericjmx](#class-collectdplugingenericjmx)
   below)
 * `hddtemp` (see [collectd::plugin::hddtemp](#class-collectdpluginhddtemp) below)
+* `hugepages` (see [collectd::plugin::hugepages](#class-collectdpluginhugepages) below)
 * `intel_pmu` (see [collectd::plugin::intel_pmu](#class-collectdpluginintel_pmu) below)
+* `intel_rdt` (see [collectd::plugin::intel_rdt](#class-collectdpluginintel_rdt) below)
 * `interface` (see [collectd::plugin::interface](#class-collectdplugininterface)
   below)
 * `ipmi` (see [collectd::plugin::ipmi](#class-collectdpluginipmi) below)
@@ -151,6 +154,8 @@ documentation for each plugin for configurable attributes.
 * `nfs`  (see [collectd::plugin::nfs](#class-collectdpluginnfs) below)
 * `nginx` (see [collectd::plugin::nginx](#class-collectdpluginnginx) below)
 * `ntpd` (see [collectd::plugin::ntpd](#class-collectdpluginntpd) below)
+* `numa` (see [collectd::plugin::numa](#class-collectdpluginnuma) below)
+* `nut` (see [collectd::plugin::nut](#class-collectdpluginnut) below)
 * `openldap` (see [collectd::plugin::openldap](#class-collectdpluginopenldap) below)
 * `openvpn` (see [collectd::plugin::openvpn](#class-collectdpluginopenvpn) below)
 * `perl` (see [collectd::plugin::perl](#class-collectdpluginperl) below)
@@ -257,6 +262,17 @@ class { 'collectd::plugin::apache':
       'url' => 'http://localhost:8080/mod_status?auto'
     }
   },
+}
+```
+
+### Class: `collectd::plugin::battery`
+
+```puppet
+class { 'collectd::plugin::battery':
+  interval => 30,
+  values_percentage => true,
+  report_degraded => true,
+  query_state_fs => true,
 }
 ```
 
@@ -856,12 +872,31 @@ class { 'collectd::plugin::hddtemp':
 }
 ```
 
+#### Class: `collectd::plugin::hugepages`
+
+```puppet
+class { 'collectd::plugin::hugepages':
+  report_per_node_hp => true,
+  report_root_hp     => true,
+  values_pages       => true,
+  values_bytes       => false,
+  values_percentage  => false
+}
+```
+
 #### Class: `collectd::plugin::intel_pmu`
 ```puppet
 class { 'collectd::plugin::intel_pmu':
   report_hardware_cache_events => true,
   report_kernel_pmu_events => true,
   report_software_events => true,
+}
+```
+
+#### Class: `collectd::plugin::intel_rdt`
+```puppet
+class { 'collectd::plugin::intel_rdt':
+  cores => ['0-2' '3,4,6' '8-10,15']
 }
 ```
 
@@ -1119,6 +1154,21 @@ class { 'collectd::plugin::ntpd':
 }
 ```
 
+#### Class: `collectd::plugin::numa`
+
+```puppet
+class { 'collectd::plugin::numa':
+}
+```
+
+#### Class: `collectd::plugin::nut`
+
+```puppet
+class { 'collectd::plugin::nut':
+    upss => [ 'ups@localhost:port' ]
+}
+```
+
 #### Class: `collectd::plugin::openldap`
 
 ```puppet
@@ -1357,6 +1407,9 @@ class { 'collectd::plugin::protocols':
 ```
 
 #### Class: `collectd::plugin::python`
+The plugin uses a fact `python_dir` to find the python load path for modules.
+python must be installed as a pre-requisite for the this fact to give a
+non-default value.
 
 * `modulepaths` is an array of paths where will be Collectd looking for Python
   modules, Puppet will ensure that each of specified directories exists and it
@@ -1421,7 +1474,9 @@ collectd::plugin::python::module {'my-module':
   modulepath    => '/var/share/collectd',
   script_source => 'puppet:///modules/myorg/my-module.py',
   config        => [
-    {'Key' => "value"}
+    {'Key'   => "value",
+     'Value' => 3.4,
+    }
   ]
 }
 ```
@@ -1926,6 +1981,7 @@ gem install bundler
 bundle install
 bundle exec rake lint
 bundle exec rake validate
+bundle exec rake rubocop
 bundle exec rake spec SPEC_OPTS='--format documentation'
 ```
 
