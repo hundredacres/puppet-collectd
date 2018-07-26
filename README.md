@@ -135,6 +135,7 @@ documentation for each plugin for configurable attributes.
 * `intel_rdt` (see [collectd::plugin::intel_rdt](#class-collectdpluginintel_rdt) below)
 * `interface` (see [collectd::plugin::interface](#class-collectdplugininterface)
   below)
+* `ipc` (see [collectd::plugin::ipc](#class-collectdpluginipc) below)
 * `ipmi` (see [collectd::plugin::ipmi](#class-collectdpluginipmi) below)
 * `iptables` (see [collectd::plugin::iptables](#class-collectdpluginiptables) below)
 * `iscdhcp` (see [collectd::plugin::iscdhcp](#class-collectdpluginiscdhcp) below)
@@ -918,6 +919,13 @@ class { 'collectd::plugin::irq':
 }
 ```
 
+#### Class: `collectd::plugin::ipc`
+
+```puppet
+class { 'collectd::plugin::ipc':
+}
+```
+
 #### Class: `collectd::plugin::ipmi`
 
 ```puppet
@@ -1366,6 +1374,44 @@ class { 'collectd::plugin::postgresql':
 }
 ```
 
+#### Class: `collectd::plugin::powerdns`
+
+You can either specify powerdns servers / recursors at once:
+
+```puppet
+class { 'collectd::plugin::powerdns':
+  recursors => {
+    'recursor1' => {
+      'socket'  => '/var/run/my-socket',
+      'collect' => ['cache-hits', 'cache-misses'],
+    },
+    'recursor2' => {}
+  },
+  servers => {
+    'server1' => {
+      'socket'  => '/var/run/my-socket',
+      'collect' => ['latency', 'recursing-answers', 'recursing-questions'],
+    }
+  },
+}
+```
+
+Or define single server / recursor:
+
+```puppet
+collectd::plugin::powerdns::recursor { 'my-recursor' :
+  socket  => '/var/run/my-socket',
+  collect => ['cache-hits', 'cache-misses'],
+}
+```
+
+```puppet
+collectd::plugin::powerdns::server { 'my-server' :
+  socket  => '/var/run/my-socket',
+  collect => ['latency', 'recursing-answers', 'recursing-questions'],
+}
+```
+
 #### Class: `collectd::plugin::processes`
 
 You can either specify processes / process matches at once:
@@ -1719,6 +1765,29 @@ collectd::plugin::tail::file { 'exim-log':
 }
 ```
 
+#### Class: `collectd::plugin::tail_csv`
+
+```puppet
+class { '::collectd::plugin::tail_csv':
+  metrics => {
+    'snort-dropped' => {
+      'type'        => 'gauge',
+      'values_from' => 1,
+      'instance'    => "dropped"
+    },
+  },
+  files  => {
+    '/var/log/snort/snort.stats' => {
+      'collect'   => ['snort-dropped'],
+      'plugin'    => 'snortstats',
+      'instance'  => 'eth0',
+      'interval'  => 600,
+      'time_from' => 5,
+    }
+  }
+}
+```
+
 #### Class: `collectd::plugin::thermal`
 
 ```puppet
@@ -1732,6 +1801,42 @@ class { '::collectd::plugin::thermal':
 
 ```puppet
 class { 'collectd::plugin::threshold':
+  hosts   => [
+    {
+      name    => 'example.com',
+      plugins => [
+        {
+          name  => 'load',
+          types => [
+            {
+              name        => 'load',
+              data_source => 'shortterm',
+              warning_max => $facts.dig('processors', 'count') * 1.2,
+              failure_max => $facts.dig('processors', 'count') * 1.9,
+            },
+            {
+              name        => 'load',
+              data_source => 'midterm',
+              warning_max => $facts.dig('processors', 'count') * 1.1,
+              failure_max => $facts.dig('processors', 'count') * 1.7,
+            },
+            {
+              name        => 'load',
+              data_source => 'longterm',
+              warning_max => $facts.dig('processors', 'count'),
+              failure_max => $facts.dig('processors', 'count') * 1.5,
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  plugins => [
+    # See plugin definition above
+  ],
+  types   => [
+    # See types definition above
+  ],
 }
 ```
 
@@ -1888,8 +1993,14 @@ class { 'collectd::plugin::write_network':
 
 ```puppet
 class { 'collectd::plugin::write_riemann':
-  riemann_host => 'riemann.example.org',
-  riemann_port => 5555,
+  nodes => [
+    {
+      'name' => 'riemann.example.org',
+      'host' => 'riemann.example.org',
+      'port' => 5555,
+      'protocol' => 'TCP'
+    }
+  ],
   tags         => ['foo'],
   attributes   => {'bar' => 'baz'},
 }
