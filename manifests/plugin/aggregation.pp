@@ -5,7 +5,7 @@ class collectd::plugin::aggregation (
   Hash $aggregators                 = {},
 ) {
 
-  include ::collectd
+  include collectd
 
   collectd::plugin { 'aggregation':
     ensure   => $ensure,
@@ -16,5 +16,9 @@ class collectd::plugin::aggregation (
     'ensure' => $ensure,
   }
 
-  create_resources(collectd::plugin::aggregation::aggregator, $aggregators, $defaults)
+  $aggregators.each |String $resource, Hash $attributes| {
+    collectd::plugin::aggregation::aggregator { $resource:
+      * => $defaults + $attributes,
+    }
+  }
 }

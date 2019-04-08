@@ -8,9 +8,9 @@ class collectd::plugin::java (
   Optional[Stdlib::Absolutepath] $java_home = undef,
 ) {
 
-  include ::collectd
+  include collectd
 
-  $_manage_package = pick($manage_package, $::collectd::manage_package)
+  $_manage_package = pick($manage_package, $collectd::manage_package)
 
   if $facts['os']['family'] == 'RedHat' {
     if $_manage_package {

@@ -17,9 +17,9 @@ class collectd::plugin::cuda (
   Optional[String] $package_provider = 'pip',
   Optional[String] $provider_proxy   = undef,
 ) {
-  include ::collectd
+  include collectd
 
-  $_manage_package = pick($manage_package, $::collectd::manage_package)
+  $_manage_package = pick($manage_package, $collectd::manage_package)
 
   if ($_manage_package) {
     if (!defined(Package['python-pip'])) {

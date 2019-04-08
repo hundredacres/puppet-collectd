@@ -1,12 +1,13 @@
 # See http://collectd.org/documentation/manpages/collectd.conf.5.shtml#plugin_exec
 class collectd::plugin::exec (
-  Hash $commands   = {},
-  $interval        = undef,
-  $ensure          = 'present',
-  Boolean $globals = false,
+  Hash $commands          = {},
+  Hash $commands_defaults = {},
+  $interval               = undef,
+  $ensure                 = 'present',
+  Boolean $globals        = false,
 ) {
 
-  include ::collectd
+  include collectd
 
   collectd::plugin { 'exec':
     ensure   => $ensure,
@@ -38,5 +39,9 @@ class collectd::plugin::exec (
     target  => $exec_conf,
   }
 
-  create_resources(collectd::plugin::exec::cmd, $commands)
+  $commands.each |String $resource, Hash $attributes| {
+    collectd::plugin::exec::cmd { $resource:
+      * => $commands_defaults + $attributes,
+    }
+  }
 }

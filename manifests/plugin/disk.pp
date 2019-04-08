@@ -10,13 +10,13 @@ class collectd::plugin::disk (
   Optional[Array[String]] $package_install_options = undef
 ) {
 
-  include ::collectd
+  include collectd
 
   if $facts['os']['family'] == 'RedHat' {
     if $manage_package != undef {
       $_manage_package = $manage_package
     } else {
-      if versioncmp($::collectd::collectd_version_real, '5.5') >= 0 {
+      if versioncmp($collectd::collectd_version_real, '5.5') >= 0 {
         $_manage_package = true
     } else {
         $_manage_package = false
@@ -24,7 +24,7 @@ class collectd::plugin::disk (
     }
 
     if $ensure == 'present' {
-      $ensure_real = $::collectd::package_ensure
+      $ensure_real = $collectd::package_ensure
     } elsif $ensure == 'absent' {
       $ensure_real = 'absent'
     }
