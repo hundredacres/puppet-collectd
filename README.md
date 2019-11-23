@@ -1453,8 +1453,8 @@ class { 'collectd::plugin::protocols':
 
 #### Class: `collectd::plugin::python`
 The plugin uses a fact `python_dir` to find the python load path for modules.
-python must be installed as a pre-requisite for the this fact to give a
-non-default value.
+python or python3 must be installed as a pre-requisite for the this
+fact to give a non-default value.
 
 * `modulepaths` is an array of paths where will be Collectd looking for Python
   modules, Puppet will ensure that each of specified directories exists and it
@@ -2090,6 +2090,58 @@ $db = '/etc/collectd/types.db'
 collectd::typesdb { $db:
   mode => '0644',
 }
+```
+
+## Puppet Tasks
+Assuming that the collectdctl command is available on remote nodes puppet tasks exist to
+run collectdctl and collect results from nodes. The tasks rely on `python3` being available
+also.
+
+### Puppet Task collectd::listval
+```bash
+$ bolt task show collectd::listval
+collectd::listval - Lists all available collectd metrics
+
+USAGE:
+bolt task run --nodes <node-name> collectd::listval
+collectd::listval - Lists all available collectd metrics
+
+USAGE:
+bolt task run --nodes <node-name> collectd::listval
+```
+
+### Puppet Task collectd::getval
+```bash
+$ bolt task show collectd::getval
+
+collectd::getval - Get a particular metric for a host
+
+USAGE:
+bolt task run --nodes <node-name> collectd::getval metric=<value>
+
+PARAMETERS:
+- metric: String[1]
+    Name of metric, e.g. load/load-relative
+
+```
+
+#### Example Task collectd::getval
+
+```bash
+$ bolt -u root task run collectd::getval metric=load/load-relative -n aiadm32.example.org
+```
+
+returns the values of the load metric.
+
+```json
+  {
+    "metric": "load/load-relative",
+    "values": {
+      "shortterm": "1.750000e-01",
+      "longterm": "8.000000e-02",
+      "midterm": "8.500000e-02"
+    }
+  }
 ```
 
 ## Limitations
